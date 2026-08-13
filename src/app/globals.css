@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+/*
+  Class AI design tokens.
+  Direction: instrument panel — near-black chassis, hairline rules, one amber
+  signal accent. Amber (not acid-green or violet) because the product's subject
+  world is measurement: readouts, traces, calibrated scales.
+*/
+@theme {
+  --color-ink: #0b0c0e;
+  --color-slate: #14161a;
+  --color-surface: #1b1e24;
+  --color-rule: #272b32;
+  --color-signal: #d9a441;
+  --color-graphite: #8b919b;
+  --color-paper: #e9e7e2;
+
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-literata), Georgia, serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --radius-card: 10px;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-rule);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Clears both sticky bars on the lecture page (navbar 64px + section nav
+       42px) so an in-page jump never lands under them. */
+    scroll-padding-top: 7.5rem;
+    background-color: var(--color-ink);
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-signal) 28%, transparent);
+    color: var(--color-paper);
+  }
+}
+
+/* Focus ring, deliberately unlayered.
+
+   Inside @layer base this lost to unlayered author styles and fell back to
+   currentColor, which made the ring invisible on same-coloured controls. Kept
+   as a literal amber for the same reason. */
+:focus-visible {
+  outline: 2px solid #d9a441;
+  outline-offset: 2px;
+}
+
+@layer components {
+  /* Monospace eyebrow used to label a region, echoing instrument panel legends. */
+  .legend {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-graphite);
+  }
+
+  /* Long-form lecture prose. Serif + generous measure because students read
+     this for a long time. */
+  .prose-notes {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: color-mix(in srgb, var(--color-paper) 88%, transparent);
+  }
+
+  .prose-notes strong {
+    color: var(--color-paper);
+    font-weight: 600;
+  }
+
+  /* Calibration scale — repeating ticks, used as a section rule. */
+  .tick-rule {
+    height: 6px;
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--color-rule) 0 1px,
+      transparent 1px 8px
+    );
+  }
+}
+
+@layer utilities {
+  .animate-trace {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: trace 2.4s ease-out forwards;
+  }
+
+  .animate-rise {
+    animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-bar {
+    animation: bar 1.1s ease-in-out infinite;
+  }
+
+  .animate-blip {
+    animation: blip 2s ease-in-out infinite;
+  }
+}
+
+@keyframes trace {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bar {
+  0%,
+  100% {
+    transform: scaleY(0.22);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes blip {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-trace {
+    stroke-dashoffset: 0;
+  }
+}
